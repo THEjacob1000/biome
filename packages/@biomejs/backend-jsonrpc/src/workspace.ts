@@ -9141,6 +9141,10 @@ export interface OpenFileParams {
 	content: FileContent;
 	documentFileSource?: DocumentFileSource;
 	inlineConfig?: Configuration;
+	/**
+	 * Used to enable further document services e.g. semantic model
+	 */
+	needsDocumentServices?: boolean;
 	path: BiomePath;
 	/**
 	* Set to `true` to persist the node cache used during parsing, in order to
