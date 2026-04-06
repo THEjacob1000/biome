@@ -2042,7 +2042,7 @@ See https://biomejs.dev/linter/rules/no-ambiguous-anchor-text
 	 */
 	noAmbiguousAnchorText?: NoAmbiguousAnchorTextConfiguration;
 	/**
-	* Succinct description of the rule.
+	* Require stringification to avoid values that only use the default object representation.
 See https://biomejs.dev/linter/rules/no-base-to-string 
 	 */
 	noBaseToString?: NoBaseToStringConfiguration;
@@ -7476,7 +7476,9 @@ export interface NoAmbiguousAnchorTextOptions {
 	 */
 	words?: string[];
 }
-export type NoBaseToStringOptions = {};
+export interface NoBaseToStringOptions {
+	ignoredTypeNames?: string[];
+}
 export type NoBeforeInteractiveScriptOutsideDocumentOptions = {};
 export type NoConditionalExpectOptions = {};
 export type NoContinueOptions = {};
