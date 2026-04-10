@@ -3,14 +3,20 @@ use crate::session::ConfigurationStatus;
 use crate::utils::apply_document_changes;
 use crate::{documents::Document, session::Session};
 use biome_configuration::ConfigurationPathHint;
+use biome_fs::ConfigName;
 use biome_service::workspace::{
     ChangeFileParams, CloseFileParams, DocumentFileSource, FeaturesBuilder, FileContent,
-    GetFileContentParams, IgnoreKind, OpenFileParams, PathIsIgnoredParams,
+    GetFileContentParams, IgnoreKind, OpenFileParams, OpenProjectParams, OpenProjectResult,
+    PathIsIgnoredParams, ScanKind,
 };
 use camino::Utf8PathBuf;
 use std::sync::Arc;
 use tower_lsp_server::ls_types as lsp;
 use tracing::{debug, error, field, info, trace};
+
+fn is_biome_configuration_file(path: &Utf8PathBuf) -> bool {
+    path.ends_with(ConfigName::biome_json()) || path.ends_with(ConfigName::biome_jsonc())
+}
 
 /// Handler for `textDocument/didOpen` LSP notification
 #[tracing::instrument(
@@ -105,6 +111,33 @@ pub(crate) async fn did_open(
                         return Ok(());
                     }
                 }
+            } else if is_biome_configuration_file(&path) {
+                let project_path = path
+                    .parent()
+                    .map(|parent| parent.to_path_buf())
+                    .unwrap_or_default();
+                let OpenProjectResult { project_key } =
+                    match session.workspace.open_project(OpenProjectParams {
+                        path: project_path.as_path().into(),
+                        open_uninitialized: true,
+                    }) {
+                        Ok(result) => result,
+                        Err(error) => {
+                            error!("Could not open fallback project for {path}: {error}");
+                            return Ok(());
+                        }
+                    };
+
+                session
+                    .insert_and_scan_project(
+                        project_key,
+                        project_path.clone().into(),
+                        ScanKind::KnownFiles,
+                        false,
+                    )
+                    .await;
+
+                project_key
             } else {
                 error!("Configuration could not be loaded for {path}");
 
