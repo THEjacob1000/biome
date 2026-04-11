@@ -9489,6 +9489,13 @@ export interface GetFileContentParams {
 	path: BiomePath;
 	projectKey: ProjectKey;
 }
+export interface MigrateConfigurationParams {
+	path: BiomePath;
+	projectKey: ProjectKey;
+}
+export interface MigrateConfigurationResult {
+	content?: string;
+}
 export interface GetControlFlowGraphParams {
 	cursor: TextSize;
 	path: BiomePath;
@@ -9820,6 +9827,9 @@ export interface Workspace {
 	getSyntaxTree(params: GetSyntaxTreeParams): Promise<GetSyntaxTreeResult>;
 	checkFileSize(params: CheckFileSizeParams): Promise<CheckFileSizeResult>;
 	getFileContent(params: GetFileContentParams): Promise<string>;
+	migrateConfiguration(
+		params: MigrateConfigurationParams,
+	): Promise<MigrateConfigurationResult>;
 	getControlFlowGraph(params: GetControlFlowGraphParams): Promise<string>;
 	getFormatterIr(params: GetFormatterIRParams): Promise<string>;
 	getTypeInfo(params: GetTypeInfoParams): Promise<string>;
@@ -9883,6 +9893,9 @@ export function createWorkspace(transport: Transport): Workspace {
 		},
 		getFileContent(params) {
 			return transport.request("biome/get_file_content", params);
+		},
+		migrateConfiguration(params) {
+			return transport.request("biome/migrate_configuration", params);
 		},
 		getControlFlowGraph(params) {
 			return transport.request("biome/get_control_flow_graph", params);
