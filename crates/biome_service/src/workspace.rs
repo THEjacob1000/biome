@@ -1578,8 +1578,7 @@ pub trait Workspace: Send + Sync + RefUnwindSafe {
         params: CheckFileSizeParams,
     ) -> Result<CheckFileSizeResult, WorkspaceError>;
 
-    /// Returns the migrated content of an open Biome configuration file if any
-    /// native config migration applies.
+    /// Migrates a configuration file, and it returns its content.
     fn migrate_configuration(
         &self,
         params: MigrateConfigurationParams,

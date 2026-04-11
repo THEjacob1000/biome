@@ -135,11 +135,11 @@ impl BiomePath {
     }
 
     /// The priority of the file.
-    /// - `biome.json` and `biome.jsonc` have the highest priority
+    /// - Biome configuration files have the highest priority
     /// - `package.json`, `tsconfig.json`/`jsconfig.json`, and `turbo.json` have the second-highest priority, and they are considered as manifest files
     /// - Other files are considered as files to handle
     fn priority(file_name: &str) -> FileKinds {
-        if file_name == ConfigName::biome_json() || file_name == ConfigName::biome_jsonc() {
+        if ConfigName::file_names().contains(&file_name) {
             FileKinds::Config
         } else if matches!(
             file_name,
@@ -336,6 +336,8 @@ mod test {
         assert_eq!(BiomePath::priority("turbo.jsonc"), FileKinds::Manifest);
         assert_eq!(BiomePath::priority("biome.json"), FileKinds::Config);
         assert_eq!(BiomePath::priority("biome.jsonc"), FileKinds::Config);
+        assert_eq!(BiomePath::priority(".biome.json"), FileKinds::Config);
+        assert_eq!(BiomePath::priority(".biome.jsonc"), FileKinds::Config);
         assert_eq!(BiomePath::priority(".gitignore"), FileKinds::Ignore);
         assert_eq!(BiomePath::priority(".ignore"), FileKinds::Ignore);
     }
