@@ -767,7 +767,10 @@ impl Rule for OrganizeImports {
         let sort_order = options.identifier_order.unwrap_or_default();
         let mut chunk: Option<ChunkBuilder> = None;
         let mut prev_kind: Option<JsSyntaxKind> = None;
-        let mut prev_group = 0;
+        // By choosing `u16::MAX` we make sure that `blank_line_separated_groups`
+        // is always `false` for the first import of the file.
+        // This makes sure that the import sorter doesn't add an extra leading newline.
+        let mut prev_group = u16::MAX;
         for item in root.items() {
             if let Some((info, specifiers, attributes)) = ImportInfo::from_module_item(&item) {
                 let prev_is_distinct = prev_kind.is_some_and(|kind| kind != item.syntax().kind());

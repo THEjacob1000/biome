@@ -1,0 +1,34 @@
+---
+source: crates/biome_js_analyze/tests/spec_tests.rs
+expression: no-leaading-extra-newline.js
+---
+# Input
+```js
+
+import A from "a";
+import "chunked";
+import B from "b";
+
+```
+
+# Diagnostics
+```
+no-leaading-extra-newline.js:2:1 assist/source/organizeImports  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  i The imports and exports are not sorted.
+  
+  > 2 │ import A from "a";
+      │ ^^^^^^^^^^^^^^^^^^
+    3 │ import "chunked";
+    4 │ import B from "b";
+  
+  i Safe fix: Organize Imports (Biome)
+  
+    2 2 │   import A from "a";
+    3 3 │   import "chunked";
+      4 │ + 
+    4 5 │   import B from "b";
+    5 6 │   
+  
+
+```
