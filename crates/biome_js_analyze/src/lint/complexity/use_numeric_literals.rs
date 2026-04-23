@@ -8,7 +8,7 @@ use biome_js_factory::make;
 use biome_js_semantic::SemanticModel;
 use biome_js_syntax::{
     AnyJsExpression, AnyJsLiteralExpression, AnyJsMemberExpression, JsCallExpression,
-    JsSyntaxToken, global_identifier,
+    JsSyntaxToken, global_identifier, static_value::StaticValue,
 };
 use biome_rowan::{AstNode, AstSeparatedList, BatchMutationExt};
 use biome_rule_options::use_numeric_literals::UseNumericLiteralsOptions;
@@ -115,7 +115,7 @@ impl Rule for UseNumericLiterals {
 
 pub struct CallInfo {
     callee: &'static str,
-    text: Box<str>,
+    text: StaticValue,
     radix: Radix,
 }
 
@@ -129,11 +129,7 @@ impl CallInfo {
         else {
             return None;
         };
-        let text = text
-            .as_any_js_expression()?
-            .as_static_value()?
-            .as_string_constant()?
-            .into();
+        let text = text.as_any_js_expression()?.as_static_value()?;
         let radix = radix
             .as_any_js_expression()?
             .as_any_js_literal_expression()?
@@ -149,7 +145,7 @@ impl CallInfo {
 
     fn to_numeric_literal(&self) -> Option<JsSyntaxToken> {
         // `parseInt` ignores leading and trailing white-spaces
-        let text_trimmed = self.text.trim();
+        let text_trimmed = self.text.as_string_constant()?.trim();
         // Handle optional sign
         let (sign, text_trimmed) = if let Some(text) = text_trimmed.strip_prefix('-') {
             ("-", text)
